@@ -1,0 +1,347 @@
+<html>
+
+<body>
+    <h1>Popup Extension</h1>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+        }
+
+        h2 {
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 1px solid #ccc;
+        }
+
+        button {
+            margin: 5px;
+            padding: 8px;
+            cursor: pointer;
+        }
+
+        input {
+            margin: 5px;
+            padding: 8px;
+            width: 250px;
+        }
+
+        .btn-group {
+            margin-bottom: 10px;
+        }
+
+        .parameter {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .parameter label {
+            width: 120px;
+        }
+    </style>
+        <!-- Session Lifecycle Methods -->
+        <h2>Session Lifecycle</h2>
+        <div class="btn-group">
+            <button id="get-session-info">Get Session Info</button>
+            <div class="parameter">
+                <label for="redirect-url">Redirect URL:</label>
+                <input type="text" id="redirect-url" placeholder="https://testsite.surfly.com/">
+            </div>
+            <button id="end-session">End Session</button>
+            <button id="request-to-host">Request To Host</button>
+            <div class="parameter">
+                <label for="make-host-client-index">Host Client Index:</label>
+                <input type="number" id="make-host-client-index" placeholder="Client Index">
+            </div>
+            <button id="make-host">Make Host</button>
+        </div>
+
+        <!-- Videochat Controls -->
+        <h2>Videochat Controls</h2>
+        <div class="btn-group">
+            <button id="toggle-videochat-fullscreen">Toggle Videochat Fullscreen</button>
+            <button id="toggle-videochat-microphone">Toggle Videochat Microphone</button>
+            <div class="parameter">
+                <label for="videochat-mode">Videochat Mode:</label>
+                <input type="text" id="videochat-mode" placeholder="Mode value">
+            </div>
+            <button id="toggle-videochat-mode">Toggle Videochat Mode</button>
+            <button id="start-screensharing">Start Screensharing</button>
+        </div>
+
+        <!-- Tab Control Methods -->
+        <h2>Tab Control</h2>
+        <div class="btn-group">
+            <button id="request-tab-control">Request Tab Control</button>
+            <button id="revoke-tab-control">Revoke Tab Control</button>
+            <button id="return-tab-control">Return Tab Control</button>
+            <div class="parameter">
+                <label for="client-index">Client Index:</label>
+                <input type="number" id="client-index" placeholder="Client Index">
+            </div>
+            <button id="transfer-tab-control">Transfer Tab Control</button>
+        </div>
+
+        <!-- Participants -->
+        <h2>Misc</h2>
+        <div class="btn-group">
+            <button id="get-participants">Get Participants</button>
+            <button id="toggle-drawing">Toggle Drawing</button>
+            <input type="file" id="file-upload">
+            <button id="upload-file">Upload File</button>
+        </div>
+
+        <!-- Logging -->
+        <h2>Logging</h2>
+        <div class="btn-group">
+            <div class="parameter">
+                <label for="log-type">Type:</label>
+                <input type="text" id="log-type" placeholder="Log type" value="user_action">
+            </div>
+            <div class="parameter">
+                <label for="log-action">Action:</label>
+                <input type="text" id="log-action" placeholder="Action" value="button_click">
+            </div>
+            <div class="parameter">
+                <label for="log-var0">var0:</label>
+                <input type="text" id="log-var0" placeholder="Variable 0">
+            </div>
+            <div class="parameter">
+                <label for="log-var1">var1:</label>
+                <input type="text" id="log-var1" placeholder="Variable 1">
+            </div>
+            <button id="send-log">Send Log</button>
+        </div>
+
+        <!-- Tabs API -->
+        <h2>Tabs API</h2>
+        <div class="btn-group">
+            <div class="parameter">
+                <label for="tab-url">URL:</label>
+                <input type="text" id="tab-url" placeholder="https://testsite.surfly.com/" value="https://www.google.com">
+            </div>
+            <button id="create-tab">Create Tab</button>
+            <button id="query-tabs">Query Tabs</button>
+            <div class="parameter">
+                <label for="tab-id">Tab ID:</label>
+                <input type="number" id="tab-id" placeholder="Tab ID">
+            </div>
+            <button id="activate-tab">Activate Tab</button>
+            <button id="pause-tabs">Pause Tabs</button>
+            <button id="resume-tabs">Resume Tabs</button>
+        </div>
+
+        <!-- Relocate -->
+        <h2>Relocate</h2>
+        <div class="btn-group">
+            <div class="parameter">
+                <label for="relocate-url">URL:</label>
+                <input type="text" id="relocate-url" placeholder="https://testsite.surfly.com/">
+            </div>
+            <div class="parameter">
+                <label for="relocate-tab-id">Tab ID (optional):</label>
+                <input type="text" id="relocate-tab-id" placeholder="Tab ID">
+            </div>
+            <button id="relocate">Relocate</button>
+        </div>
+
+        <!-- Runtime API -->
+        <h2>Runtime API</h2>
+        <div class="btn-group">
+            <div class="parameter">
+                <label for="message-content">Message:</label>
+                <input type="text" id="message-content" placeholder="Message content">
+            </div>
+            <button id="send-message">Send Message</button>
+            <button id="broadcast-message">Broadcast Message</button>
+        </div>
+
+        <div id="result"
+            style="margin-top: 20px; padding: 10px; background-color: #f5f5f5; border: 1px solid #ddd; min-height: 100px;">
+            <h3>Results:</h3>
+            <pre id="result-content"></pre>
+        </div>
+
+        <script>
+            // Session Lifecycle
+            document.getElementById('start-screensharing').addEventListener('click', () => {
+                browser.webfuseSession.startScreensharing();
+                console.log('Screensharing started');
+            });
+
+            document.getElementById('get-session-info').addEventListener('click', () => {
+                browser.webfuseSession.getSessionInfo(info => {
+                    document.getElementById('result-content').textContent = JSON.stringify(info, null, 2);
+                });
+            });
+
+            document.getElementById('end-session').addEventListener('click', () => {
+                const redirectUrl = document.getElementById('redirect-url').value;
+                browser.webfuseSession.end(redirectUrl);
+                console.log('Session ended');
+            });
+
+            document.getElementById('request-to-host').addEventListener('click', () => {
+                browser.webfuseSession.requestToHost();
+            });
+
+            document.getElementById('make-host').addEventListener('click', () => {
+                const clientIndex = parseInt(document.getElementById('make-host-client-index').value);
+                if (isNaN(clientIndex)) {
+                    return;
+                }
+                browser.webfuseSession.makeHost(clientIndex);
+            });
+
+            // Videochat Controls
+            document.getElementById('toggle-videochat-fullscreen').addEventListener('click', () => {
+                browser.webfuseSession.toggleVideochatFullscreen();
+                console.log('Videochat fullscreen toggled');
+            });
+
+            document.getElementById('toggle-videochat-microphone').addEventListener('click', () => {
+                browser.webfuseSession.toggleVideochatMicrophone();
+                console.log('Videochat microphone toggled');
+            });
+
+            document.getElementById('toggle-videochat-mode').addEventListener('click', () => {
+                const mode = document.getElementById('videochat-mode').value;
+                browser.webfuseSession.toggleVideochatMode(mode);
+                console.log('Videochat mode toggled:', mode);
+            });
+
+            document.getElementById('toggle-drawing').addEventListener('click', () => {
+                browser.webfuseSession.toggleDrawing();
+                console.log('Drawing toggled');
+            });
+
+            // Tab Control
+            document.getElementById('request-tab-control').addEventListener('click', () => {
+                browser.webfuseSession.requestTabControl();
+                console.log('Tab control requested');
+            });
+
+            document.getElementById('revoke-tab-control').addEventListener('click', () => {
+                browser.webfuseSession.revokeTabControl();
+                console.log('Tab control revoked');
+            });
+
+            document.getElementById('return-tab-control').addEventListener('click', () => {
+                browser.webfuseSession.returnTabControl();
+                console.log('Tab control returned');
+            });
+
+            document.getElementById('transfer-tab-control').addEventListener('click', () => {
+                const clientIndex = parseInt(document.getElementById('client-index').value);
+                if (isNaN(clientIndex)) {
+                    console.log('Please enter a valid client index');
+                    return;
+                }
+                browser.webfuseSession.transferTabControl(clientIndex);
+                console.log('Tab control transferred to client:', clientIndex);
+            });
+
+            // Participants
+            document.getElementById('get-participants').addEventListener('click', () => {
+                console.log('Getting participants');
+                browser.webfuseSession.getParticipants(participants => {
+                    console.log('Participants:', participants);
+                    document.getElementById('result-content').textContent = JSON.stringify(participants, null, 2);
+                });
+            });
+
+            // File Upload
+            document.getElementById('upload-file').addEventListener('click', () => {
+                const fileInput = document.getElementById('file-upload');
+                if (fileInput.files.length === 0) {
+                    console.log('Please select a file first');
+                    return;
+                }
+                browser.webfuseSession.uploadFile(fileInput.files[0]);
+                console.log('File uploaded:', fileInput.files[0].name);
+            });
+
+            // Logging
+            document.getElementById('send-log').addEventListener('click', async () => {
+                // Create JSON object for logging
+                const logData = {
+                    type: document.getElementById('log-type').value,
+                    action: document.getElementById('log-action').value
+                };
+
+                // Add any variable fields that have values
+                const var0 = document.getElementById('log-var0').value;
+                if (var0) logData.var0 = var0;
+
+                const var1 = document.getElementById('log-var1').value;
+                if (var1) logData.var1 = var1;
+
+                try {
+                    // Call the systemLog method with our JSON object
+                    browser.webfuseSession.log(logData);
+                    console.log('Log sent:', logData);
+                    document.getElementById('result-content').textContent = 'Log sent: ' + JSON.stringify(logData, null, 2);
+                } catch (error) {
+                    console.error('Logging error:', error);
+                    document.getElementById('result-content').textContent = 'Logging error: ' + error.message;
+                }
+            });
+
+            // Tabs API
+            document.getElementById('create-tab').addEventListener('click', () => {
+                const url = document.getElementById('tab-url').value;
+                browser.webfuseSession.openTab( url );
+                console.log('Tab created with URL:', url);
+            });
+
+            document.getElementById('query-tabs').addEventListener('click', () => {
+                chrome.webfuseSession.getTabs({}, tabs => {
+                    console.log('Tabs:', tabs);
+                    document.getElementById('result-content').textContent = JSON.stringify(tabs, null, 2);
+                });
+            });
+
+            document.getElementById('activate-tab').addEventListener('click', () => {
+                const tabId = document.getElementById('tab-id').value;
+                browser.webfuseSession.activateTab(tabId);
+            });
+
+            document.getElementById('pause-tabs').addEventListener('click', () => {
+                browser.webfuseSession.pauseTabs();
+                console.log('Tabs paused');
+            });
+
+            document.getElementById('resume-tabs').addEventListener('click', () => {
+                browser.webfuseSession.resumeTabs();
+                console.log('Tabs resumed');
+            });
+
+            // Relocate
+            document.getElementById('relocate').addEventListener('click', () => {
+                const url = document.getElementById('relocate-url').value;
+                const tabId = document.getElementById('relocate-tab-id').value;
+                chrome.webfuseSession.relocate(url, tabId || undefined, true);
+                console.log('Relocated to:', url, tabId ? `(tab: ${tabId})` : '');
+            });
+
+            // Runtime API
+            document.getElementById('send-message').addEventListener('click', () => {
+                const message = document.getElementById('message-content').value;
+                browser.webfuseSession.sendChatMessage(message);
+                console.log('Message sent:', message);
+            });
+
+            document.getElementById('broadcast-message').addEventListener('click', () => {
+                const message = document.getElementById('message-content').value;
+                browser.runtime.broadcastMessage(message);
+                console.log('Message broadcasted:', message);
+            });
+
+             browser.webfuseSession.onMessage.addListener((message) => {
+                console.log('session event: ', message.event_type);
+            });
+        </script>
+</body>
+</html>
