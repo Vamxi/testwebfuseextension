@@ -1,2 +1,2 @@
-console.log("Version: v1.0.0 TAG");
-  console.log("This is the 1.0.0 release");
+console.log("Version: v1.1.0 TAG");
+  console.log("This is the 1.1.0 release with new features");
