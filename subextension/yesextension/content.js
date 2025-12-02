@@ -1,2 +1,2 @@
-console.log("Version: MAIN BRANCH - Latest");
-  console.log("Testing extension import from main branch");
+console.log("Version: v1.0.0 TAG");
+  console.log("This is the 1.0.0 release");
