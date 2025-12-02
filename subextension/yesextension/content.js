@@ -1,2 +1,2 @@
-console.log("Version: v2.0.0 TAG");
-  console.log("Major version 2.0.0 - breaking changes!");
+console.log("Version: FEATURE BRANCH");
+  console.log("This is from the feature/testing branch");
