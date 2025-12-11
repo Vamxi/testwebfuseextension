@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Draggable Popup 📈🏔️°</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            height: 300px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: white;
+            padding: 16px;
+            position: relative;
+        }
+
+        #dragHandle {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: #667eea;
+            color: white;
+            padding: 6px 10px;
+            cursor: grab;
+            user-select: none;
+            font-weight: 600;
+            font-size: 12px;
+            border-radius: 4px;
+        }
+
+        #dragHandle:active {
+            cursor: grabbing;
+        }
+
+        .content {
+            padding-top: 40px;
+        }
+
+        h2 {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        p {
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 8px 16px;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            background: #f5f5f5;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        button:hover {
+            background: #e8e8e8;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="dragHandle">⋮⋮ Drag</div>
+
+    <div class="content">
+        <h2>📈🏔️°</h2>
+        <p>This popup can be dragged around the screen. Click and hold the header to move it.</p>
+        <div class="buttons">
+            <button id="attach">Attach</button>
+            <button id="detach">Detach 📈🏔️°</button>
+        </div>
+    </div>
+
+    <script>
+        // Attach/Detach buttons
+        document.getElementById('attach').addEventListener('click', () => {
+            browser.browserAction.attachPopup();
+        });
+        document.getElementById('detach').addEventListener('click', () => {
+            browser.browserAction.detachPopup();
+        });
+
+        // Simple draggable implementation
+        (function () {
+            browser.browserAction.resizePopup(250, 300)
+            const dragHandle = document.getElementById('dragHandle');
+            let isDragging = false;
+            let dragState = null;
+
+            dragHandle.addEventListener('mousedown', async (e) => {
+                isDragging = true;
+
+                // Get current popup position
+                const currentPosition = await browser.browserAction.getPopupPosition();
+                const startLeft = parseInt(currentPosition.left) || 0;
+                const startTop = parseInt(currentPosition.top) || 0;
+
+                // Save drag start state
+                dragState = {
+                    startScreenX: e.screenX,
+                    startScreenY: e.screenY,
+                    startLeft: startLeft,
+                    startTop: startTop,
+                };
+
+                e.preventDefault();
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging || !dragState) return;
+
+                // Calculate how far mouse moved
+                const deltaX = e.screenX - dragState.startScreenX;
+                const deltaY = e.screenY - dragState.startScreenY;
+
+                // Calculate new position (don't go negative)
+                const newLeft = Math.max(0, dragState.startLeft + deltaX);
+                const newTop = Math.max(0, dragState.startTop + deltaY);
+
+                // Update popup position
+                browser.browserAction.setPopupPosition({
+                    left: `${newLeft}px`,
+                    top: `${newTop}px`
+                });
+            });
+
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+                dragState = null;
+            });
+        })();
+    </script>
+</body>
+
+</html>
