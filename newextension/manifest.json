@@ -13,7 +13,7 @@
     "env": [
         {
             "key": "extensionnumber",
-            "value": "1",
+            "value": "",
             "description": "ExNumber"
         }
     ]
