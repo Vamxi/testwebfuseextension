@@ -1,0 +1,33 @@
+name: Deploy Extension
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Deploy extension
+        env:
+          SERVER_NAME: ${{ secrets.WEBFUSE_SERVER_NAME }}
+          SPACE_ID: ${{ secrets.WEBFUSE_SPACE_ID }}
+          EXTENSION_ID: ${{ secrets.WEBFUSE_EXTENSION_ID }}
+          REST_KEY: ${{ secrets.WEBFUSE_REST_KEY }}
+          STORAGE_APP: ${{ secrets.WEBFUSE_STORAGE_APP }}
+          REPO_URL: ${{ github.server_url }}/${{ github.repository }}/newextension
+          REF: ${{ github.ref_name }}
+        run: python deploy_extension.py
